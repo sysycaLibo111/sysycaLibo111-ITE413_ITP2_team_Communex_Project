@@ -1,0 +1,82 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Login</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="login-container">
+    <ion-card class="login-card">
+      <ion-card-content>
+        <div class="logo-section">
+          <div class="icon-wrapper">
+            <ion-icon name="shield-checkmark-outline"></ion-icon>
+          </div>
+          <h1>Welcome Back</h1>
+          <p>Sign in to your account</p>
+        </div>
+
+        <form [formGroup]="loginForm" (ngSubmit)="onLogin()">
+          <div class="form-section">
+            <!-- Email -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Email Address</ion-label>
+              <ion-input 
+                type="email" 
+                formControlName="email"
+                placeholder="your.email@example.com"
+                class="input-field">
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please enter a valid email
+              </p>
+            </ion-text>
+
+            <!-- Password -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Password</ion-label>
+              <ion-input 
+                [type]="showPassword ? 'text' : 'password'" 
+                formControlName="password"
+                placeholder="Enter your password"
+                class="input-field">
+              </ion-input>
+              <ion-button 
+                slot="end" 
+                fill="clear" 
+                (click)="togglePasswordVisibility()" 
+                class="eye-button"
+                aria-label="Toggle password visibility">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </ion-button>
+            </ion-item>
+            <ion-text color="danger" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Password must be at least 6 characters
+              </p>
+            </ion-text>
+          </div>
+
+          <ion-button 
+            expand="block" 
+            type="submit" 
+            [disabled]="loginForm.invalid"
+            class="login-btn">
+            <ion-icon name="log-in-outline" slot="start"></ion-icon>
+            Sign In
+          </ion-button>
+        </form>
+
+        <div class="footer-links">
+          <p>Don't have an account? <a (click)="goToRegister()" class="register-link">Sign Up</a></p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>

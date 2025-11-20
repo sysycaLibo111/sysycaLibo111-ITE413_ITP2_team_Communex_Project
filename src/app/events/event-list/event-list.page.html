@@ -1,0 +1,101 @@
+<!-- <ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>event-list</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">event-list</ion-title>
+    </ion-toolbar>
+  </ion-header>
+</ion-content> -->
+<!-- events/event-list/event-list.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/resident-dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Events</ion-title>
+    <ion-buttons slot="end" *ngIf="isAdmin">
+      <ion-button (click)="createEvent()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar>
+    <ion-segment [value]="selectedFilter" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="upcoming">
+        <ion-label>Upcoming</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="completed">
+        <ion-label>Completed</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <ion-list *ngIf="!isLoading && filteredEvents.length > 0">
+    <ion-item 
+      *ngFor="let event of filteredEvents" 
+      (click)="viewEvent(event)"
+      button
+      detail
+    >
+      <ion-thumbnail slot="start" *ngIf="event.imageUrl">
+        <img [src]="event.imageUrl" [alt]="event.title">
+      </ion-thumbnail>
+      
+      <ion-label>
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.description | slice:0:100 }}...</p>
+        <ion-text color="medium">
+          <small>
+            <ion-icon name="calendar-outline"></ion-icon>
+            {{ event.when | date:'medium' }}
+          </small>
+        </ion-text>
+        <br>
+        <ion-text color="medium">
+          <small>
+            <ion-icon name="location-outline"></ion-icon>
+            {{ event.where }}
+          </small>
+        </ion-text>
+      </ion-label>
+
+      <ion-badge 
+        slot="end" 
+        [color]="event.status === 'upcoming' ? 'success' : event.status === 'completed' ? 'medium' : 'warning'"
+      >
+        {{ event.status }}
+      </ion-badge>
+    </ion-item>
+  </ion-list>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner></ion-spinner>
+    <p>Loading events...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredEvents.length === 0" class="empty-state">
+    <ion-icon name="calendar-outline" size="large"></ion-icon>
+    <h3>No Events Found</h3>
+    <p>There are no events matching your criteria.</p>
+    <ion-button *ngIf="isAdmin" (click)="createEvent()">
+      Create First Event
+    </ion-button>
+  </div>
+</ion-content>

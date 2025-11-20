@@ -1,0 +1,138 @@
+<!-- events/create-event/create-event.page.html -->
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin-dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create New Event</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+    
+    <!-- Basic Information -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Basic Information</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Event Title *</ion-label>
+          <ion-input formControlName="title" type="text"></ion-input>
+        </ion-item>
+        <ion-text color="danger" *ngIf="eventForm.get('title')?.touched && eventForm.get('title')?.errors">
+          <small *ngIf="eventForm.get('title')?.errors?.['required']">Title is required</small>
+          <small *ngIf="eventForm.get('title')?.errors?.['minlength']">Title must be at least 5 characters</small>
+        </ion-text>
+
+        <ion-item>
+          <ion-label position="stacked">Description *</ion-label>
+          <ion-textarea formControlName="description" rows="4"></ion-textarea>
+        </ion-item>
+        <ion-text color="danger" *ngIf="eventForm.get('description')?.touched && eventForm.get('description')?.errors">
+          <small *ngIf="eventForm.get('description')?.errors?.['required']">Description is required</small>
+          <small *ngIf="eventForm.get('description')?.errors?.['minlength']">Description must be at least 10 characters</small>
+        </ion-text>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- 5W1H Details -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Event Details (5W1H)</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">What (Event Details) *</ion-label>
+          <ion-textarea formControlName="what" rows="3"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">When (Date & Time) *</ion-label>
+          <ion-datetime formControlName="when" displayFormat="MMM DD, YYYY HH:mm"></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Where (Location) *</ion-label>
+          <ion-input formControlName="where" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Who (Organizer/Target) *</ion-label>
+          <ion-input formControlName="who" type="text"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Why (Purpose) *</ion-label>
+          <ion-textarea formControlName="why" rows="3"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">How (Participation) *</ion-label>
+          <ion-textarea formControlName="how" rows="3"></ion-textarea>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Event Image -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Event Image</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="image-upload-container">
+          <input 
+            type="file" 
+            accept="image/*" 
+            (change)="onImageSelected($event)"
+            style="display: none"
+            #fileInput
+          >
+          
+          <div *ngIf="!imagePreview" class="upload-placeholder" (click)="fileInput.click()">
+            <ion-icon name="image-outline" size="large"></ion-icon>
+            <p>Tap to upload event image</p>
+          </div>
+
+          <div *ngIf="imagePreview" class="image-preview">
+            <img [src]="imagePreview" alt="Event preview">
+            <ion-button fill="clear" color="danger" (click)="removeImage()">
+              <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Additional Settings -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Additional Settings</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-item>
+          <ion-label position="stacked">Maximum Attendees (Optional)</ion-label>
+          <ion-input formControlName="maxAttendees" type="number" min="0"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-checkbox formControlName="isRegistrationRequired" slot="start"></ion-checkbox>
+          <ion-label>Require Registration</ion-label>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Submit Button -->
+    <ion-button 
+      type="submit" 
+      expand="block" 
+      [disabled]="eventForm.invalid || isSubmitting"
+      class="submit-button"
+    >
+      <ion-spinner *ngIf="isSubmitting" slot="start"></ion-spinner>
+      Create Event
+    </ion-button>
+
+  </form>
+</ion-content>

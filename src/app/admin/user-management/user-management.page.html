@@ -1,0 +1,141 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>User Management</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="container">
+    <!-- Loading Spinner -->
+    <div *ngIf="loading()" class="loading-spinner">
+      <mat-spinner></mat-spinner>
+      <p>Loading users...</p>
+    </div>
+
+    <!-- Users Table -->
+    <div *ngIf="!loading()">
+      <mat-card>
+        <mat-card-header>
+          <mat-card-title>Registered Users ({{ users().length }})</mat-card-title>
+          <mat-card-subtitle>Edit button is only available for non-admin users</mat-card-subtitle>
+        </mat-card-header>
+        
+        <mat-card-content>
+          <table mat-table [dataSource]="users()" class="mat-elevation-z8">
+            
+            <!-- Name Column -->
+            <ng-container matColumnDef="displayName">
+              <th mat-header-cell *matHeaderCellDef> Name </th>
+              <td mat-cell *matCellDef="let user"> 
+                <strong>{{ user.displayName }}</strong>
+                <br>
+                <small class="text-muted">{{ user.phoneNumber }}</small>
+              </td>
+            </ng-container>
+            
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+              <th mat-header-cell *matHeaderCellDef> Email </th>
+              <td mat-cell *matCellDef="let user"> {{ user.email }} </td>
+            </ng-container>
+            
+            <!-- Barangay Column -->
+            <ng-container matColumnDef="barangay">
+              <th mat-header-cell *matHeaderCellDef> Barangay </th>
+              <td mat-cell *matCellDef="let user"> 
+                <span class="barangay-badge">{{ user.barangay }}</span>
+              </td>
+            </ng-container>
+             <!-- Sitio Column -->
+            <ng-container matColumnDef="sitio">
+              <th mat-header-cell *matHeaderCellDef> Sitio </th>
+              <td mat-cell *matCellDef="let user"> 
+                <span class="barangay-badge">{{ user.sitio }}</span>
+              </td>
+            </ng-container>
+            
+            <!-- Role Column -->
+            <ng-container matColumnDef="role">
+              <th mat-header-cell *matHeaderCellDef> Role </th>
+              <td mat-cell *matCellDef="let user"> 
+                <span class="role-badge" 
+                      [class.admin]="user.role === 'admin'"
+                      [class.resident]="user.role === 'resident'"
+                      [class.staff]="user.role === 'staff'"
+                      [class.volunteer]="user.role === 'volunteer'"
+                      [class.official]="user.role === 'official'">
+                  {{ user.role }}
+                </span>
+              </td>
+            </ng-container>
+            
+            <!-- Status Column -->
+            <ng-container matColumnDef="status">
+              <th mat-header-cell *matHeaderCellDef> Status </th>
+              <td mat-cell *matCellDef="let user">
+                <mat-chip 
+                  [color]="user.status === 'approved' ? 'primary' : 
+                          (user.status === 'rejected' ? 'warn' : 'accent')" 
+                  selected>
+                  {{ user.status }}
+                </mat-chip>
+              </td>
+            </ng-container>
+            
+            <!-- Actions Column -->
+            <ng-container matColumnDef="actions">
+              <th mat-header-cell *matHeaderCellDef> Actions </th>
+              <td mat-cell *matCellDef="let user" class="actions-cell">
+                <!-- View Button -->
+                <button mat-icon-button color="primary" (click)="onView(user)" 
+                        matTooltip="View Details">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+                
+                <!-- Edit Button (Only for non-admin users) -->
+                <button mat-icon-button color="accent" (click)="onEdit(user)" 
+                        *ngIf="canEditUser(user)"
+                        matTooltip="Edit User">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                
+                <!-- Approve Button -->
+                <button mat-icon-button color="primary" (click)="onApprove(user)" 
+                        *ngIf="user.status !== 'approved'" 
+                        matTooltip="Approve User">
+                  <mat-icon>check_circle</mat-icon>
+                </button>
+                
+                <!-- Reject Button -->
+                <button mat-icon-button color="warn" (click)="onReject(user)" 
+                        *ngIf="user.status !== 'rejected'" 
+                        matTooltip="Reject User">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+                
+                <!-- Delete Button -->
+                <button mat-icon-button color="warn" (click)="onDelete(user)" 
+                        matTooltip="Delete User">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+            
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+
+          <!-- Empty State -->
+          <div *ngIf="users().length === 0" class="empty-state">
+            <mat-icon>people_outline</mat-icon>
+            <h3>No Users Found</h3>
+            <p>There are no registered users in the system yet.</p>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</ion-content>

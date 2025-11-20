@@ -1,0 +1,253 @@
+<!-- src/app/admin/announcement-form/announcement-form.page.html -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/manage-announcements"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ isEditMode ? 'Edit' : 'Add' }} Announcement</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form class="announcement-form">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Basic Information</ion-card-title>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- Title -->
+        <ion-item>
+          <ion-label position="stacked">Title <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            [(ngModel)]="formData.title" 
+            name="title"
+            placeholder="Enter announcement title"
+            type="text">
+          </ion-input>
+        </ion-item>
+
+        <!-- Content -->
+        <ion-item>
+          <ion-label position="stacked">Content <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea 
+            [(ngModel)]="formData.content" 
+            name="content"
+            placeholder="Enter announcement content"
+            rows="4"
+            [autoGrow]="true">
+          </ion-textarea>
+        </ion-item>
+
+        <!-- Category -->
+        <ion-item>
+          <ion-label position="stacked">Category <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select 
+            [(ngModel)]="formData.category" 
+            name="category"
+            interface="popover">
+            <ion-select-option value="general">General</ion-select-option>
+            <ion-select-option value="emergency">Emergency</ion-select-option>
+            <ion-select-option value="event">Event</ion-select-option>
+            <ion-select-option value="meeting">Meeting</ion-select-option>
+            <ion-select-option value="public_service">Public Service</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Priority -->
+        <ion-item>
+          <ion-label position="stacked">Priority <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select 
+            [(ngModel)]="formData.priority" 
+            name="priority"
+            interface="popover">
+            <ion-select-option value="low">Low</ion-select-option>
+            <ion-select-option value="medium">Medium</ion-select-option>
+            <ion-select-option value="high">High</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Active Status -->
+        <ion-item>
+          <ion-label>Active Status</ion-label>
+          <ion-toggle 
+            [(ngModel)]="formData.isActive" 
+            name="isActive"
+            [checked]="formData.isActive">
+          </ion-toggle>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- 5W1H Section (shown for non-general categories) -->
+    <ion-card *ngIf="should5W1HFieldsShow()">
+      <ion-card-header>
+        <ion-card-title>Event Details (5W1H)</ion-card-title>
+        <ion-card-subtitle>Required for {{ formData.category }} category</ion-card-subtitle>
+      </ion-card-header>
+      
+      <ion-card-content>
+        <!-- What -->
+        <ion-item>
+          <ion-label position="stacked">What <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            [(ngModel)]="formData.what" 
+            name="what"
+            placeholder="What is this announcement about?"
+            type="text">
+          </ion-input>
+        </ion-item>
+
+        <!-- When -->
+        <ion-item>
+          <ion-label position="stacked">When <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            [(ngModel)]="formData.when" 
+            name="when"
+            placeholder="e.g., Nov 11, 2025, 5:00 PM - 7:00 PM"
+            type="text">
+          </ion-input>
+          <ion-note slot="helper">Format: Date, Start Time - End Time</ion-note>
+        </ion-item>
+
+        <!-- Where -->
+        <ion-item>
+          <ion-label position="stacked">Where <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            [(ngModel)]="formData.where" 
+            name="where"
+            placeholder="Enter location"
+            type="text">
+          </ion-input>
+        </ion-item>
+
+        <!-- Who -->
+        <ion-item>
+          <ion-label position="stacked">Who (Target Audience) <ion-text color="danger">*</ion-text></ion-label>
+          <ion-input 
+            [(ngModel)]="formData.who" 
+            name="who"
+            placeholder="e.g., All Residents, Barangay Officials"
+            type="text">
+          </ion-input>
+        </ion-item>
+
+        <!-- Why -->
+        <ion-item>
+          <ion-label position="stacked">Why <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea 
+            [(ngModel)]="formData.why" 
+            name="why"
+            placeholder="Why is this important?"
+            rows="3"
+            [autoGrow]="true">
+          </ion-textarea>
+        </ion-item>
+
+        <!-- How -->
+        <ion-item>
+          <ion-label position="stacked">How <ion-text color="danger">*</ion-text></ion-label>
+          <ion-textarea 
+            [(ngModel)]="formData.how" 
+            name="how"
+            placeholder="How to participate or get involved?"
+            rows="3"
+            [autoGrow]="true">
+          </ion-textarea>
+        </ion-item>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Image Upload Section -->
+    <!-- <ion-card>
+      <ion-card-header>
+        <ion-card-title>Image (Optional)</ion-card-title>
+      </ion-card-header> -->
+      <!-- In the image upload section -->
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Image (Optional)</ion-card-title>
+    <ion-card-subtitle>Maximum 500KB recommended for better performance</ion-card-subtitle>
+  </ion-card-header>
+      
+      <!-- <ion-card-content>
+        <div class="image-upload-section">
+        
+          <div class="image-preview" *ngIf="imagePreview || currentImageUrl">
+            <img [src]="imagePreview || currentImageUrl" alt="Preview">
+            <ion-button 
+              fill="clear" 
+              color="danger" 
+              class="remove-image-btn"
+              (click)="removeImage()">
+              <ion-icon slot="icon-only" name="close-circle"></ion-icon>
+            </ion-button>
+          </div>
+
+      
+          <div class="upload-button" *ngIf="!imagePreview && !currentImageUrl">
+            <input 
+              type="file" 
+              #imageInput
+              accept="image/*"
+              (change)="onImageSelected($event)"
+              style="display: none;">
+            <ion-button 
+              expand="block" 
+              fill="outline"
+              (click)="imageInput.click()">
+              <ion-icon slot="start" name="image"></ion-icon>
+              Choose Image
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card> -->
+  <ion-card-content>
+    <div class="image-upload-section">
+      <!-- Current or Preview Image -->
+      <div class="image-preview" *ngIf="imagePreview || currentImageUrl">
+        <img [src]="imagePreview || currentImageUrl" alt="Preview">
+        <ion-button 
+          fill="clear" 
+          color="danger" 
+          class="remove-image-btn"
+          (click)="removeImage()">
+          <ion-icon slot="icon-only" name="close-circle"></ion-icon>
+        </ion-button>
+      </div>
+
+      <!-- Upload Button -->
+      <div class="upload-button" *ngIf="!imagePreview && !currentImageUrl">
+        <input 
+          type="file" 
+          #imageInput
+          accept="image/*"
+          (change)="onImageSelected($event)"
+          style="display: none;">
+        <ion-button 
+          expand="block" 
+          fill="outline"
+          (click)="imageInput.click()">
+          <ion-icon slot="start" name="image"></ion-icon>
+          Choose Image (Max 500KB)
+        </ion-button>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card>
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button expand="block" color="medium" (click)="cancel()">
+        <ion-icon slot="start" name="close"></ion-icon>
+        Cancel
+      </ion-button>
+      
+      <ion-button expand="block" color="primary" (click)="saveAnnouncement()">
+        <ion-icon slot="start" name="checkmark"></ion-icon>
+        {{ isEditMode ? 'Update' : 'Create' }}
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

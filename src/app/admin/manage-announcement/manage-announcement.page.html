@@ -1,0 +1,289 @@
+<!-- src/app/admin/manage-announcements/manage-announcements.page.html -->
+<ion-header>
+  <ion-toolbar >
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin-dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Manage Announcements</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="addAnnouncement()">
+        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshAnnouncements($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="loading">
+    <ion-spinner></ion-spinner>
+    <p>Loading announcements...</p>
+  </div>
+
+  <!-- Top Cards Section -->
+  <div class="top-cards-section" *ngIf="!loading">
+    <!-- Upcoming Event Card -->
+      <ion-grid>
+      <ion-row>
+     
+    <div class="card-container" *ngIf="upcomingAnnouncements.length > 0">
+      <h3 class="section-title1">
+        <ion-icon name="time-outline"></ion-icon>
+        Next Upcoming Event
+      </h3>
+      <ion-card class="featured-card upcoming-card" *ngFor="let announcement of upcomingAnnouncements" 
+                (click)="viewAnnouncement(announcement)">
+        <!-- Image for featured cards -->
+        <div class="card-image" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+          <img [src]="announcement.imageBase64 || announcement.imageUrl" [alt]="announcement.title">
+        </div>
+        
+        <ion-card-header>
+          <div class="card-badges">
+            <ion-badge [color]="getStatusColor(announcement.status)">
+              {{ announcement.status | uppercase }}
+            </ion-badge>
+            <ion-badge [color]="getPriorityColor(announcement.priority)">
+              {{ announcement.priority | uppercase }}
+            </ion-badge>
+          </div>
+          <ion-card-title>{{ announcement.title }}</ion-card-title>
+          <ion-card-subtitle>
+            <ion-icon [name]="getCategoryIcon(announcement.category)"></ion-icon>
+            {{ announcement.category | titlecase }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="announcement-meta">
+            <p><ion-icon name="time"></ion-icon> {{ announcement.when || 'Not specified' }}</p>
+            <p><ion-icon name="location"></ion-icon> {{ announcement.where || 'Not specified' }}</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+
+    <!-- Latest 2 Announcements -->
+    <div class="card-container" *ngIf="latestAnnouncements.length > 0">
+      <h3 class="section-title2">
+        <ion-icon name="newspaper-outline"></ion-icon>
+        Latest Announcements
+      </h3>
+      <ion-card class="featured-card latest-card" *ngFor="let announcement of latestAnnouncements" 
+                (click)="viewAnnouncement(announcement)">
+        <!-- Image for featured cards -->
+        <div class="card-image" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+          <img [src]="announcement.imageBase64 || announcement.imageUrl" [alt]="announcement.title">
+        </div>
+        
+        <ion-card-header>
+          <div class="card-badges">
+            <ion-badge [color]="getStatusColor(announcement.status)">
+              {{ announcement.status | uppercase }}
+            </ion-badge>
+            <ion-badge [color]="getPriorityColor(announcement.priority)">
+              {{ announcement.priority | uppercase }}
+            </ion-badge>
+            <ion-badge *ngIf="!announcement.isActive" color="danger">
+              INACTIVE
+            </ion-badge>
+          </div>
+          <ion-card-title>{{ announcement.title }}</ion-card-title>
+          <ion-card-subtitle>
+            <ion-icon [name]="getCategoryIcon(announcement.category)"></ion-icon>
+            {{ announcement.category | titlecase }} • {{ announcement.createdAt | date:'short' }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <p class="content-preview">{{ announcement.content }}</p>
+        </ion-card-content>
+      </ion-card>
+    </div>
+    </ion-row>
+  </ion-grid>
+        <!-- Ongoing Events -->
+    <div class="card-container" *ngIf="ongoingAnnouncements.length > 0">
+      <h3 class="section-title">
+        <ion-icon name="radio-outline"></ion-icon>
+        Ongoing Events
+      </h3>
+      <ion-card class="featured-card ongoing-card" *ngFor="let announcement of ongoingAnnouncements" 
+                (click)="viewAnnouncement(announcement)">
+        <!-- Image for featured cards -->
+        <div class="card-image" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+          <img [src]="announcement.imageBase64 || announcement.imageUrl" [alt]="announcement.title">
+        </div>
+        
+        <ion-card-header>
+          <div class="card-badges">
+            <ion-badge color="success" class="pulse">
+              LIVE NOW
+            </ion-badge>
+            <ion-badge [color]="getPriorityColor(announcement.priority)">
+              {{ announcement.priority | uppercase }}
+            </ion-badge>
+          </div>
+          <ion-card-title>{{ announcement.title }}</ion-card-title>
+          <ion-card-subtitle>
+            <ion-icon name="time"></ion-icon>
+            {{ announcement.when || 'Not specified' }}
+          </ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="announcement-meta">
+            <p><ion-icon name="location"></ion-icon> {{ announcement.where || 'Not specified' }}</p>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+  </div>
+
+  <!-- Filters Section -->
+  <div class="filters-section" *ngIf="!loading">
+    <ion-searchbar 
+      placeholder="Search announcements..." 
+      (ionInput)="onSearchChange($event)"
+      [debounce]="300">
+    </ion-searchbar>
+
+    <div class="filter-chips">
+      <ion-chip>
+        <ion-label>Category:</ion-label>
+        <ion-select interface="popover" [(ngModel)]="selectedCategory" (ionChange)="onCategoryChange($event)">
+          <ion-select-option value="all">All</ion-select-option>
+          <ion-select-option value="general">General</ion-select-option>
+          <ion-select-option value="emergency">Emergency</ion-select-option>
+          <ion-select-option value="event">Event</ion-select-option>
+          <ion-select-option value="meeting">Meeting</ion-select-option>
+          <ion-select-option value="public_service">Public Service</ion-select-option>
+        </ion-select>
+      </ion-chip>
+
+      <ion-chip>
+        <ion-label>Priority:</ion-label>
+        <ion-select interface="popover" [(ngModel)]="selectedPriority" (ionChange)="onPriorityChange($event)">
+          <ion-select-option value="all">All</ion-select-option>
+          <ion-select-option value="low">Low</ion-select-option>
+          <ion-select-option value="medium">Medium</ion-select-option>
+          <ion-select-option value="high">High</ion-select-option>
+        </ion-select>
+      </ion-chip>
+
+      <ion-chip>
+        <ion-label>Status:</ion-label>
+        <ion-select interface="popover" [(ngModel)]="selectedStatus" (ionChange)="onStatusChange($event)">
+          <ion-select-option value="all">All</ion-select-option>
+          <ion-select-option value="upcoming">Upcoming</ion-select-option>
+          <ion-select-option value="ongoing">Ongoing</ion-select-option>
+          <ion-select-option value="completed">Completed</ion-select-option>
+        </ion-select>
+      </ion-chip>
+    </div>
+  </div>
+
+  <!-- Announcements List -->
+  <div class="announcements-list" *ngIf="!loading">
+    <h3 class="section-title">All Announcements ({{ filteredAnnouncements.length }})</h3>
+ <ion-grid>
+      <ion-row>
+    <ion-card *ngFor="let announcement of filteredAnnouncements" 
+              class="announcement-card"
+              (click)="viewAnnouncement(announcement)">
+      
+      <!-- Image Section -->
+      <div class="card-image" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+        <img [src]="announcement.imageBase64 || announcement.imageUrl" [alt]="announcement.title">
+        <div class="image-overlay"></div>
+      </div>
+
+      <ion-card-header>
+        <div class="card-header-top">
+          <div class="card-badges">
+            <ion-badge [color]="getStatusColor(announcement.status)">
+              {{ announcement.status }}
+            </ion-badge>
+            <ion-badge [color]="getPriorityColor(announcement.priority)">
+              {{ announcement.priority }}
+            </ion-badge>
+            <ion-badge [color]="announcement.isActive ? 'success' : 'danger'">
+              {{ announcement.isActive ? 'ACTIVE' : 'INACTIVE' }}
+            </ion-badge>
+          </div>
+          
+          <ion-buttons>
+            <ion-button fill="clear" size="small" (click)="editAnnouncement(announcement, $event)">
+              <ion-icon slot="icon-only" name="create" color="primary"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="toggleStatus(announcement, $event)">
+              <ion-icon slot="icon-only" 
+                        [name]="announcement.isActive ? 'eye-off' : 'eye'" 
+                        [color]="announcement.isActive ? 'warning' : 'success'">
+              </ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="deleteAnnouncement(announcement, $event)">
+              <ion-icon slot="icon-only" name="trash" color="danger"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </div>
+
+        <ion-card-title>{{ announcement.title }}</ion-card-title>
+        <ion-card-subtitle>
+          <ion-icon [name]="getCategoryIcon(announcement.category)"></ion-icon>
+          {{ announcement.category | titlecase }}
+        </ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="content-preview">
+          {{ announcement.content | slice:0:100 }}{{ announcement.content.length > 100 ? '...' : '' }}
+        </div>
+
+        <div class="announcement-details" *ngIf="announcement.category !== 'general'">
+          <ion-grid>
+            <ion-row>
+              <ion-col size="12" size-md="6">
+                <p class="detail-item">
+                  <ion-icon name="time"></ion-icon>
+                  <strong>When:</strong> {{ announcement.when || 'Not specified' }}
+                </p>
+              </ion-col>
+              <ion-col size="12" size-md="6">
+                <p class="detail-item">
+                  <ion-icon name="location"></ion-icon>
+                  <strong>Where:</strong> {{ announcement.where || 'Not specified' }}
+                </p>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </div>
+
+        <div class="card-footer">
+          <span class="created-date">
+            <ion-icon name="calendar"></ion-icon>
+            {{ announcement.createdAt | date:'MMM d, y, h:mm a' }}
+          </span>
+          <span class="image-indicator" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+            <ion-icon name="image"></ion-icon>
+            Has Image
+          </span>
+        </div>
+      </ion-card-content>
+    </ion-card>
+      </ion-row>
+ </ion-grid>
+    <!-- Empty State -->
+    <div class="empty-state" *ngIf="filteredAnnouncements.length === 0">
+      <ion-icon name="megaphone-outline"></ion-icon>
+      <h3>No announcements found</h3>
+      <p>Create your first announcement to get started.</p>
+      <ion-button (click)="addAnnouncement()">
+        <ion-icon slot="start" name="add"></ion-icon>
+        Add Announcement
+      </ion-button>
+    </div>
+  </div>
+</ion-content>

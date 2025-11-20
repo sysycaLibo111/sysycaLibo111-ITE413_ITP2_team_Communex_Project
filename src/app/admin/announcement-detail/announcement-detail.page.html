@@ -1,0 +1,201 @@
+<!-- src/app/admin/announcement-detail/announcement-detail.page.html -->
+
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/admin/manage-announcements"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Announcement Details</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="editAnnouncement()">
+        <ion-icon slot="icon-only" name="create"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="announcement">
+  <!-- Header Image -->
+    <div class="card-image" *ngIf="announcement.imageBase64 || announcement.imageUrl">
+        <img [src]="announcement.imageBase64 || announcement.imageUrl" [alt]="announcement.title">
+        <div class="image-overlay"></div>
+      </div>
+
+
+  <!-- Main Content -->
+  <div class="detail-content">
+    <!-- Status Badges -->
+    <div class="badges-section">
+      <ion-badge [color]="getStatusColor(announcement.status)">
+        {{ announcement.status | uppercase }}
+      </ion-badge>
+      <ion-badge [color]="getPriorityColor(announcement.priority)">
+        {{ announcement.priority | uppercase }} PRIORITY
+      </ion-badge>
+      <ion-badge [color]="announcement.isActive ? 'success' : 'danger'">
+        {{ announcement.isActive ? 'ACTIVE' : 'INACTIVE' }}
+      </ion-badge>
+    </div>
+
+    <!-- Title & Category -->
+    <div class="title-section">
+      <h1>{{ announcement.title }}</h1>
+      <div class="category">
+        <ion-icon [name]="getCategoryIcon(announcement.category)"></ion-icon>
+        <span>{{ announcement.category | titlecase }}</span>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="document-text"></ion-icon>
+          Content
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p class="content-text">{{ announcement.content }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- 5W1H Details (if not general) -->
+    <ion-card *ngIf="announcement.category !== 'general'">
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="information-circle"></ion-icon>
+          Event Details
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="detail-grid">
+          <!-- What -->
+          <div class="detail-item">
+            <div class="detail-label">
+              <ion-icon name="help-circle"></ion-icon>
+              <strong>What</strong>
+            </div>
+            <p>{{ announcement.what }}</p>
+          </div>
+
+          <!-- When -->
+          <div class="detail-item">
+            <div class="detail-label">
+              <ion-icon name="time"></ion-icon>
+              <strong>When</strong>
+            </div>
+            <p>{{ announcement.when }}</p>
+          </div>
+
+          <!-- Where -->
+          <div class="detail-item">
+            <div class="detail-label">
+              <ion-icon name="location"></ion-icon>
+              <strong>Where</strong>
+            </div>
+            <p>{{ announcement.where }}</p>
+          </div>
+
+          <!-- Who -->
+          <div class="detail-item">
+            <div class="detail-label">
+              <ion-icon name="people"></ion-icon>
+              <strong>Who</strong>
+            </div>
+            <p>{{ announcement.who }}</p>
+          </div>
+
+          <!-- Why -->
+          <div class="detail-item full-width">
+            <div class="detail-label">
+              <ion-icon name="bulb"></ion-icon>
+              <strong>Why</strong>
+            </div>
+            <p>{{ announcement.why }}</p>
+          </div>
+
+          <!-- How -->
+          <div class="detail-item full-width">
+            <div class="detail-label">
+              <ion-icon name="construct"></ion-icon>
+              <strong>How</strong>
+            </div>
+            <p>{{ announcement.how }}</p>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Metadata -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>
+          <ion-icon name="information"></ion-icon>
+          Metadata
+        </ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="metadata-grid">
+          <div class="metadata-item">
+            <ion-icon name="calendar"></ion-icon>
+            <div>
+              <strong>Created</strong>
+              <p>{{ announcement.createdAt | date:'MMM d, y, h:mm a' }}</p>
+            </div>
+          </div>
+
+          <div class="metadata-item">
+            <ion-icon name="refresh"></ion-icon>
+            <div>
+              <strong>Last Updated</strong>
+              <p>{{ announcement.updatedAt | date:'MMM d, y, h:mm a' }}</p>
+            </div>
+          </div>
+
+          <div class="metadata-item">
+            <ion-icon name="person"></ion-icon>
+            <div>
+              <strong>Created By</strong>
+              <p>{{ announcement.createdBy }}</p>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <ion-button 
+        expand="block" 
+        [color]="announcement.isActive ? 'warning' : 'success'"
+        (click)="toggleStatus()">
+        <ion-icon slot="start" [name]="announcement.isActive ? 'eye-off' : 'eye'"></ion-icon>
+        {{ announcement.isActive ? 'Deactivate' : 'Activate' }}
+      </ion-button>
+
+      <ion-button 
+        expand="block" 
+        color="primary"
+        (click)="editAnnouncement()">
+        <ion-icon slot="start" name="create"></ion-icon>
+        Edit Announcement
+      </ion-button>
+
+      <ion-button 
+        expand="block" 
+        color="danger"
+        (click)="deleteAnnouncement()">
+        <ion-icon slot="start" name="trash"></ion-icon>
+        Delete Announcement
+      </ion-button>
+    </div>
+  </div>
+</ion-content>
+
+<!-- Loading State -->
+<ion-content *ngIf="!announcement">
+  <div class="loading-state">
+    <ion-spinner></ion-spinner>
+    <p>Loading announcement...</p>
+  </div>
+</ion-content>

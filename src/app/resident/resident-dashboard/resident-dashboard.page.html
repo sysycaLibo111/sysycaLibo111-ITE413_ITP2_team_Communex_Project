@@ -1,0 +1,164 @@
+<!-- resident-dashboard.page.html -->
+<ion-header [translucent]="true">
+  <ion-toolbar color="light">
+    <ion-buttons slot="start">
+      <ion-icon name="albums-outline" size="large" color="primary"></ion-icon>
+    </ion-buttons>
+
+    <ion-title class="ion-text-center">
+      <span class="title-text">Announcements & Events</span>
+    </ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button fill="clear" (click)="handleRefresh($event)">
+        <ion-icon slot="icon-only" name="refresh-outline" size="large"></ion-icon>
+      </ion-button>
+      <ion-button fill="clear">
+        <ion-icon slot="icon-only" name="notifications-outline" size="large"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <!-- Search Bar -->
+  <ion-toolbar color="light">
+    <ion-searchbar 
+      placeholder="Search announcements..." 
+      (ionInput)="onSearchChange($event)"
+      animated
+      clear-icon="close-circle"
+      color="light">
+    </ion-searchbar>
+  </ion-toolbar>
+
+  <!-- Filter Segments -->
+  <ion-toolbar color="light">
+    <!-- <ion-segment [value]="currentFilter" (ionChange)="onFilterChange($event.detail.value)"> -->
+      <!-- Updated segment line in resident-dashboard.page.html -->
+<ion-segment [value]="currentFilter" (ionChange)="onFilterChange($event)">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="announcements">
+        <ion-label>Announcements</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="events">
+        <ion-label>Events</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" color="light">
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Loading announcements...</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && filteredAnnouncements.length === 0" class="empty-state">
+    <ion-icon name="newspaper-outline" size="large"></ion-icon>
+    <h3>No announcements found</h3>
+    <p>Check back later for updates</p>
+  </div>
+
+  <!-- Announcements List -->
+  <ion-list lines="none" *ngIf="!isLoading && filteredAnnouncements.length > 0">
+    <ion-card 
+      *ngFor="let post of filteredAnnouncements" 
+      (click)="openDetails(post)"
+      class="news-card">
+      
+      <!-- Card Header -->
+      <ion-item lines="none" class="card-header">
+        <ion-avatar slot="start" class="org-avatar">
+          <img [src]="post.imageBase64 || 'assets/icon/icon.png'" alt="Organization" />
+        </ion-avatar>
+        <ion-label class="header-label">
+          <h2 class="post-title">{{ post.title }}</h2>
+          <p class="post-meta">
+            <span class="post-category">{{ getCardSubtitle(post) }}</span>
+            <span class="post-date"> • {{ getTimeAgo(post.createdAt) }}</span>
+          </p>
+        </ion-label>
+      </ion-item>
+
+      <!-- Card Image -->
+      <img 
+        *ngIf="post.imageBase64" 
+        [src]="post.imageBase64" 
+        [alt]="post.title"
+        class="card-image" />
+
+      <!-- Card Content -->
+      <ion-card-content class="card-content">
+        <p class="post-summary">{{ post.content | slice:0:150 }}{{ post.content.length > 150 ? '...' : '' }}</p>
+        
+        <!-- Event Details (for non-general categories) -->
+        <div *ngIf="post.category !== 'general'" class="event-details">
+          <ion-chip [color]="getStatusColor(post.status)" *ngIf="post.status">
+            <ion-label>{{ post.status }}</ion-label>
+          </ion-chip>
+          
+          <div class="detail-item" *ngIf="post.when">
+            <ion-icon name="time-outline"></ion-icon>
+            <span>{{ post.when }}</span>
+          </div>
+          
+          <div class="detail-item" *ngIf="post.where">
+            <ion-icon name="location-outline"></ion-icon>
+            <span>{{ post.where }}</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-buttons">
+          <ion-button fill="clear" size="small" class="view-details-btn">
+            <ion-icon name="eye-outline" slot="start"></ion-icon>
+            View Details
+          </ion-button>
+          
+          <div class="secondary-actions">
+            <ion-button fill="clear" size="small" (click)="toggleLike(post, $event)">
+              <ion-icon name="heart-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" size="small" (click)="toggleSave(post, $event)">
+              <ion-icon name="bookmark-outline" slot="icon-only"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </ion-list>
+
+  <!-- Load More Indicator -->
+  <div *ngIf="!isLoading && filteredAnnouncements.length > 0" class="load-more">
+    <ion-text color="medium">
+      <p class="ion-text-center">You're all caught up! 🎉</p>
+    </ion-text>
+  </div>
+</ion-content>
+
+<!-- Bottom Navigation -->
+<ion-tabs>
+  <ion-tab-bar slot="bottom" class="bottom-nav">
+    <ion-tab-button tab="home" selected>
+      <ion-icon name="home"></ion-icon>
+      <ion-label>Home</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="announcements">
+      <ion-icon name="megaphone"></ion-icon>
+      <ion-label>Announcements</ion-label>
+    </ion-tab-button>
+
+    <ion-tab-button tab="event-settings">
+      <ion-icon name="calendar"></ion-icon>
+      <ion-label>My Events</ion-label>
+    </ion-tab-button>
+  </ion-tab-bar>
+</ion-tabs>

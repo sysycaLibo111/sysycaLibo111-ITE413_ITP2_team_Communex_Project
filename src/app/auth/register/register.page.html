@@ -1,0 +1,257 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Create Account</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [scrollY]="true">
+  <div class="register-container">
+    <ion-card class="register-card">
+      <ion-card-content>
+        <div class="logo-section">
+          <div class="icon-wrapper">
+            <ion-icon name="person-add-outline"></ion-icon>
+          </div>
+          <h1>Create Account</h1>
+          <p>Join our community today</p>
+        </div>
+
+        <form [formGroup]="registerForm" (ngSubmit)="onRegister()">
+          <!-- Profile Picture Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <ion-icon name="camera-outline" class="section-icon"></ion-icon>
+              <h3>Profile Picture</h3>
+            </div>
+            
+            <div class="profile-image-section">
+              <div class="image-preview" (click)="triggerFileInput()">
+                <img 
+                  [src]="imagePreview || 'assets/images/default-avatar.png'" 
+                  alt="Profile Preview"
+                  class="profile-image"
+                >
+                <div class="image-overlay">
+                  <ion-icon name="camera-outline"></ion-icon>
+                  <span>Change Photo</span>
+                </div>
+              </div>
+              <input 
+                type="file" 
+                #fileInput 
+                (change)="onFileSelected($event)" 
+                accept="image/*" 
+                hidden
+              >
+              <p class="image-help-text">Click to upload profile picture (optional)</p>
+            </div>
+          </div>
+
+          <!-- Personal Information Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <ion-icon name="person-outline" class="section-icon"></ion-icon>
+              <h3>Personal Information</h3>
+            </div>
+            
+            <!-- Full Name -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="person-circle-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Full Name *</ion-label>
+              <ion-input 
+                formControlName="fullName" 
+                placeholder="Juan Dela Cruz"
+                class="input-field">
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Full name is required
+              </p>
+            </ion-text>
+
+            <!-- Age -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="calendar-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Age *</ion-label>
+              <ion-input 
+                type="number" 
+                formControlName="age"
+                placeholder="Enter your age"
+                class="input-field"
+                min="1"
+                max="120">
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('age')?.invalid && registerForm.get('age')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please enter a valid age (1-120)
+              </p>
+            </ion-text>
+
+            <!-- Gender -->
+            <div class="radio-group">
+              <label class="radio-label">Gender *</label>
+              <ion-radio-group formControlName="gender" class="gender-options">
+                <ion-item lines="none" class="radio-item">
+                  <ion-radio slot="start" value="male" class="gender-radio"></ion-radio>
+                  <ion-label class="gender-label">Male</ion-label>
+                </ion-item>
+                <ion-item lines="none" class="radio-item">
+                  <ion-radio slot="start" value="female" class="gender-radio"></ion-radio>
+                  <ion-label class="gender-label">Female</ion-label>
+                </ion-item>
+                <ion-item lines="none" class="radio-item">
+                  <ion-radio slot="start" value="other" class="gender-radio"></ion-radio>
+                  <ion-label class="gender-label">Other</ion-label>
+                </ion-item>
+              </ion-radio-group>
+            </div>
+            <ion-text color="danger" *ngIf="registerForm.get('gender')?.invalid && registerForm.get('gender')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please select your gender
+              </p>
+            </ion-text>
+
+            <!-- Status -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="heart-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Status *</ion-label>
+              <ion-select 
+                formControlName="status"
+                placeholder="Select your status"
+                interface="action-sheet"
+                class="input-field">
+                <ion-select-option value="single">Single</ion-select-option>
+                <ion-select-option value="married">Married</ion-select-option>
+                <ion-select-option value="widowed">Widowed</ion-select-option>
+                <ion-select-option value="separated">Separated</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('status')?.invalid && registerForm.get('status')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please select your status
+              </p>
+            </ion-text>
+
+            <!-- Sitio -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="location-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Sitio *</ion-label>
+              <ion-select 
+                formControlName="sitio"
+                placeholder="Select your sitio"
+                interface="action-sheet"
+                class="input-field">
+                <ion-select-option value="Balaoan">Balaoan</ion-select-option>
+                <ion-select-option value="Carumaguit">Carumaguit</ion-select-option>
+                <ion-select-option value="Centro">Centro</ion-select-option>
+                <ion-select-option value="Dimalibot">Dimalibot</ion-select-option>
+                <ion-select-option value="Gawad Kalinga">Gawad Kalinga</ion-select-option>
+                <ion-select-option value="Tamaraw A">Tamaraw A</ion-select-option>
+                <ion-select-option value="Tamaraw B">Tamaraw B</ion-select-option>
+              </ion-select>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('sitio')?.invalid && registerForm.get('sitio')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please select your sitio
+              </p>
+            </ion-text>
+          </div>
+
+          <!-- Account Information Section -->
+          <div class="form-section">
+            <div class="section-header">
+              <ion-icon name="mail-outline" class="section-icon"></ion-icon>
+              <h3>Account Information</h3>
+            </div>
+
+            <!-- Email -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="mail-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Email *</ion-label>
+              <ion-input 
+                type="email" 
+                formControlName="email"
+                placeholder="your.email@example.com"
+                class="input-field">
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Please enter a valid email
+              </p>
+            </ion-text>
+
+            <!-- Password -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Password *</ion-label>
+              <ion-input 
+                [type]="showPassword ? 'text' : 'password'" 
+                formControlName="password"
+                placeholder="Enter your password"
+                class="input-field">
+              </ion-input>
+              <ion-button 
+                slot="end" 
+                fill="clear" 
+                (click)="togglePasswordVisibility()" 
+                class="eye-button"
+                aria-label="Toggle password visibility">
+                <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+              </ion-button>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Password must be at least 6 characters
+              </p>
+            </ion-text>
+
+            <!-- Confirm Password -->
+            <ion-item lines="none" class="custom-item">
+              <ion-icon name="lock-closed-outline" slot="start" class="input-icon"></ion-icon>
+              <ion-label position="stacked">Confirm Password *</ion-label>
+              <ion-input 
+                [type]="showPassword ? 'text' : 'password'" 
+                formControlName="confirmPassword"
+                placeholder="Re-enter your password"
+                class="input-field">
+              </ion-input>
+            </ion-item>
+            <ion-text color="danger" *ngIf="registerForm.hasError('passwordMismatch') && registerForm.get('confirmPassword')?.touched">
+              <p class="error-text">
+                <ion-icon name="alert-circle-outline"></ion-icon>
+                Passwords do not match
+              </p>
+            </ion-text>
+          </div>
+
+          <ion-button 
+            expand="block" 
+            type="submit" 
+            [disabled]="registerForm.invalid || isSubmitting"
+            class="register-btn">
+            <ion-spinner name="crescent" *ngIf="isSubmitting"></ion-spinner>
+            <ion-icon name="person-add-outline" slot="start" *ngIf="!isSubmitting"></ion-icon>
+            {{ isSubmitting ? 'Creating Account...' : 'Create Account' }}
+          </ion-button>
+        </form>
+
+        <div class="login-link">
+          <p>Already have an account? <a (click)="goToLogin()" class="login-link-text">Sign In</a></p>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
